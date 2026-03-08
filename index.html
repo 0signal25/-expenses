@@ -2,93 +2,106 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ระบบออกบันทึกข้อความราชการ</title>
+    <title>ระบบบันทึกข้อความเบิกจ่าย - ตสส.นพค.๒๕</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* ตั้งค่าฟอนต์สำหรับการแสดงผลหน้าเว็บ */
         body { 
             font-family: 'Sarabun', 'TH SarabunPSK', sans-serif; 
-            background: #f8f9fa; 
+            background: #f0f2f5; 
             margin: 0; 
             padding: 20px; 
             display: flex; 
-            gap: 20px;
+            gap: 15px;
         }
 
-        /* ส่วนแก้ไขข้อมูล (Side Panel) */
+        /* ส่วนควบคุมด้านซ้าย */
         .editor-panel {
-            width: 400px;
+            width: 450px;
             background: white;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             height: calc(100vh - 40px);
             overflow-y: auto;
+            position: sticky;
+            top: 20px;
         }
 
-        .editor-panel h2 { color: #1a73e8; font-size: 1.2rem; border-bottom: 2px solid #e8f0fe; padding-bottom: 10px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem; }
-        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Sarabun', sans-serif; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-print { width: 100%; background: #202124; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-top: 10px; }
-        .btn-print:hover { background: #3c4043; }
+        .editor-panel h2 { color: #1a73e8; font-size: 1.2rem; border-bottom: 2px solid #e8f0fe; padding-bottom: 8px; margin-top: 20px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-weight: bold; margin-bottom: 4px; font-size: 0.85rem; color: #555; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Sarabun', sans-serif; font-size: 14px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .btn-print { width: 100%; background: #28a745; color: white; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-print:hover { background: #218838; }
 
-        /* ส่วนแสดงผลเอกสาร (A4 Preview) */
-        .document-preview {
+        /* ส่วนแสดงผลเอกสารด้านขวา (A4) */
+        .document-container {
             flex: 1;
+            background: #ccc;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .document-preview {
             background: white;
             width: 210mm;
             min-height: 297mm;
-            padding: 20mm 20mm 20mm 25mm; /* ขอบซ้าย 2.5 ซม. ตามระเบียบ */
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 20mm 20mm 20mm 25mm; /* กั้นหน้า 2.5 ซม. */
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
             box-sizing: border-box;
             position: relative;
         }
 
-        /* รูปแบบตัวอักษรไทยสารบรรณ */
+        /* รูปแบบมาตรฐานสารบรรณ */
         .thai-document {
             font-family: 'TH SarabunPSK', 'Sarabun', sans-serif;
-            font-size: 16pt; /* ขนาด 16 ตามที่ระบุ */
-            line-height: 1.2;
+            font-size: 16pt; /* ขนาด 16 pt  */
+            line-height: 1.15;
             color: black;
         }
 
-        /* ตราครุฑ */
         .garuda-img {
-            width: 1.5cm; /* ขนาดมาตรฐานบันทึกข้อความ */
+            width: 1.5cm;
             position: absolute;
             top: 20mm;
             left: 20mm;
         }
 
         .header-title {
-            font-size: 29pt; /* ขนาดหัวเรื่องบันทึกข้อความ */
+            font-size: 29pt;
             font-weight: bold;
-            text-align: left;
             margin-left: 2.5cm;
-            margin-top: 5mm;
-            margin-bottom: 5mm;
+            margin-top: 0.2cm;
+            margin-bottom: 0.5cm;
         }
 
-        .info-row { display: flex; margin-bottom: 2mm; }
-        .info-label { font-weight: bold; margin-right: 5px; }
-        .flex-1 { flex: 1; }
-        .indent { text-indent: 2.5cm; }
+        .info-row { display: flex; margin-bottom: 1mm; }
+        .info-label { font-weight: bold; white-space: nowrap; margin-right: 5px; }
+        .flex-1 { flex: 1; border-bottom: 1px dotted #ccc; min-height: 1.2em; }
+        .indent { text-indent: 2.5cm; margin-top: 0.5cm; }
         .sub-indent { padding-left: 1cm; }
         
-        .signature-section {
-            margin-top: 40px;
-            float: right;
-            width: 50%;
+        /* ส่วนลงชื่อ */
+        .signature-group {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .sig-block {
+            width: 8.5cm;
             text-align: center;
+            margin-bottom: 25px;
         }
 
-        /* การตั้งค่าสำหรับการพิมพ์ */
         @media print {
+            .editor-panel, .document-container { padding: 0; background: transparent; }
             .editor-panel { display: none; }
-            body { background: white; padding: 0; }
-            .document-preview { box-shadow: none; margin: 0; width: 100%; }
+            body { padding: 0; }
+            .document-preview { box-shadow: none; margin: 0; width: 100%; border: none; }
             @page { size: A4; margin: 0; }
         }
     </style>
@@ -96,25 +109,24 @@
 <body>
 
     <div class="editor-panel">
-        <h2>แก้ไขบันทึกข้อความ</h2>
+        <h2>๑. หัวกระดาษและเดือน</h2>
         <div class="form-group">
             <label>เลขที่หนังสือ:</label>
             <input type="text" id="doc_no" value="กห ๐๓๐๙.๓.๕(ตสส.)/" oninput="update()">
         </div>
         <div class="form-group">
-            <label>วันที่:</label>
-            <input type="text" id="doc_date" value="ก.พ.๖๙" oninput="update()">
+            <label>วันที่เบิก (ขวามือบน):</label>
+            <input type="text" id="doc_date_top" value="ก.พ.๖๙" oninput="update()">
         </div>
         <div class="form-group">
-            <label>ส่วนราชการ:</label>
-            <input type="text" id="dept" value="ตสส.นสน.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
+            <label>ประจำเดือน (ในเนื้อหา):</label>
+            <input type="text" id="target_month" value="ม.ค.๖๙" oninput="update()">
         </div>
 
-        <hr>
-        <h3>คำนวณเงินอินเตอร์เน็ต</h3>
+        <h2>๒. คำนวณค่าใช้จ่าย</h2>
         <div class="grid">
             <div class="form-group">
-                <label>จำนวนจุด (๕๓๕ บ.):</label>
+                <label>จุดทั่วไป (๕๓๕ บ.):</label>
                 <input type="number" id="inet_qty" value="7" oninput="update()">
             </div>
             <div class="form-group">
@@ -122,70 +134,90 @@
                 <input type="number" id="inet_special" value="1" oninput="update()">
             </div>
         </div>
-
-        <h3>ค่าใช้จ่ายอื่นๆ</h3>
         <div class="form-group">
-            <label>ถ่านไมค์ / กล่องทีวี / ซิมกล้อง (ใส่คั่นด้วยจุลภาค):</label>
+            <label>ค่าใช้จ่ายอื่นๆ (ใส่ตัวเลขคั่นด้วยคอมม่า):</label>
             <input type="text" id="others" value="200, 278, 500" oninput="update()">
         </div>
 
-        <hr>
-        <div class="form-group">
-            <label>ชื่อผู้ลงนาม:</label>
-            <input type="text" id="signer" value="พ.อ. ..........................................." oninput="update()">
+        <h2>๓. ผู้ขอเบิก (พ.ท.)</h2>
+        <div class="grid">
+            <div class="form-group"><label>ยศ:</label><input type="text" id="s1_rank" value="พ.ท." oninput="update()"></div>
+            <div class="form-group"><label>ชื่อ-นามสกุล:</label><input type="text" id="s1_name" value="(สุริยันต์ เปรมใจ)" oninput="update()"></div>
         </div>
         <div class="form-group">
             <label>ตำแหน่ง:</label>
-            <input type="text" id="position" value="ผบ.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
+            <input type="text" id="s1_pos" value="ผบ.นสน.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
         </div>
 
-        <button class="btn-print" onclick="window.print()">สั่งพิมพ์ (Print to PDF)</button>
+        <h2>๔. ผู้อนุมัติ (พ.อ.)</h2>
+        <div class="grid">
+            <div class="form-group"><label>ยศ:</label><input type="text" id="s2_rank" value="พ.อ." oninput="update()"></div>
+            <div class="form-group"><label>วันที่อนุมัติ:</label><input type="text" id="s2_date" value="ก.พ.๖๙" oninput="update()"></div>
+        </div>
+        <div class="form-group">
+            <label>ตำแหน่ง:</label>
+            <input type="text" id="s2_pos" value="รอง ผบ.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
+        </div>
+
+        <button class="btn-print" onclick="window.print()">สั่งพิมพ์บันทึกข้อความ</button>
     </div>
 
-    <div class="document-preview thai-document">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Garuda_Emb_of_Thailand_%28Variant%29.svg/1200px-Garuda_Emb_of_Thailand_%28Variant%29.svg.png" class="garuda-img">
-        
-        <div class="header-title">บันทึกข้อความ</div>
+    <div class="document-container">
+        <div class="document-preview thai-document">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Garuda_Emb_of_Thailand_%28Variant%29.svg/1200px-Garuda_Emb_of_Thailand_%28Variant%29.svg.png" class="garuda-img">
+            <div class="header-title">บันทึกข้อความ</div>
 
-        <div class="info-row">
-            <div class="info-label">ส่วนราชการ</div>
-            <div class="flex-1" id="p_dept"></div>
-        </div>
-        <div class="info-row">
-            <div class="flex-1"><span class="info-label">ที่</span> <span id="p_no"></span></div>
-            <div style="width: 40%"><span class="info-label">วันที่</span> <span id="p_date"></span></div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">เรื่อง</div>
-            <div class="flex-1">ขอเบิกค่าใช้จ่ายต่างๆประจำเดือนของ ตสส.นพค.๒๕ฯ</div>
-        </div>
+            <div class="info-row">
+                <div class="info-label">ส่วนราชการ</div>
+                <div class="flex-1">ตสส.นสน.นพค.๒๕ สนภ.๒ นทพ.</div>
+            </div>
+            <div class="info-row">
+                <div class="flex-1"><span class="info-label">ที่</span> <span id="p_no"></span></div>
+                <div style="width: 45%"><span class="info-label">วันที่</span> <span id="p_date_top"></span></div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">เรื่อง</div>
+                <div class="flex-1">ขอเบิกค่าใช้จ่ายต่างๆประจำเดือนของ ตสส.นพค.๒๕ฯ</div>
+            </div>
 
-        <p><span class="info-label">เรียน</span> ผบ.นพค.๒๕ สนภ.๒ นทพ.</p>
+            <p><span class="info-label">เรียน</span> ผบ.นพค.๒๕ สนภ.๒ นทพ.</p>
 
-        <p class="indent">
-            ๑. ตสส.นสน.นพค.๒๕ฯ ขอเบิกค่าใช้จ่าย ประจำเดือน ม.ค.๖๙ มีรายละเอียด ดังนี้
-        </p>
-        <div class="sub-indent">
-            ๑.๑ ค่าอินเตอร์เน็ต รวมทั้งสิ้น <span id="p_inet_total"></span> บาท<br>
-            ๑.๒ ค่าใช้จ่ายอื่นๆ รวมทั้งสิ้น <span id="p_other_total"></span> บาท
-        </div>
+            <p class="indent">
+                ๑. ตสส.นสน.นพค.๒๕ฯ ขอเบิกค่าใช้จ่าย ประจำเดือน <span id="p_month"></span> มีรายละเอียด ดังนี้ 
+            </p>
+            <div class="sub-indent">
+                ๑.๑ ค่าอินเตอร์เน็ต รวมทั้งสิ้น <span id="p_inet_total"></span> บาท [cite: 9]<br>
+                ๑.๒ ค่าใช้จ่ายอื่นๆ รวมทั้งสิ้น <span id="p_other_total"></span> บาท [cite: 18]
+            </div>
 
-        <p class="indent">
-            ๒. ตสส.นสน.นพค.๒๕ ขออนุมัติเบิกค่าใช้จ่ายประจำเดือน มีรายละเอียด ดังนี้
-        </p>
-        <div class="sub-indent">
-            ๒.๑ ค่าจ่ายรายเดือนจำนวนรวม <strong><span id="p_grand_total"></span></strong> บาท
-        </div>
+            <p class="indent">
+                ๒. ตสส.นสน.นพค.๒๕ ขออนุมัติเบิกค่าใช้จ่ายประจำเดือน มีรายละเอียด ดังนี้ [cite: 22]
+            </p>
+            <div class="sub-indent">
+                ๒.๑ ค่าจ่ายรายเดือนรวมทั้งสิ้นจำนวน <strong><span id="p_grand_total"></span></strong> บาท [cite: 23]
+            </div>
 
-        <p class="indent">๓. ข้อเสนอ เห็นควรดำเนินการตามข้อ ๓.๑ และ ๓.๒</p>
-        
-        <p class="indent">จึงเรียนมาเพื่อพิจารณา หากเห็นสมควรกรุณาอนุมัติตามข้อ ๓</p>
+            <p class="indent">๓. ข้อเสนอ เห็นควรดำเนินการตามข้อ ๓.๑ และ ๓.๒ [cite: 24]</p>
+            <p class="indent">จึงเรียนมาเพื่อพิจารณา หากเห็นสมควรกรุณาอนุมัติตามข้อ ๓ [cite: 27]</p>
 
-        <div class="signature-section">
-            <br>
-            (ลงชื่อ)...........................................................<br>
-            (<span id="p_signer"></span>)<br>
-            ตำแหน่ง <span id="p_pos"></span>
+            <div class="signature-group">
+                <div class="sig-block">
+                    <br>(ลงชื่อ)...........................................................<br>
+                    <span id="p_s1_rank"></span> <span id="p_s1_name"></span><br>
+                    ตำแหน่ง <span id="p_s1_pos"></span>
+                </div>
+            </div>
+
+            <p><strong>คำสั่ง/อนุมัติ</strong></p>
+            <div class="signature-group" style="align-items: flex-start;">
+                <div class="sig-block" style="text-align: center; margin-left: 2cm;">
+                    อนุมัติ<br><br>
+                    (ลงชื่อ)...........................................................<br>
+                    (<span id="p_s2_rank"></span>)<br>
+                    ตำแหน่ง <span id="p_s2_pos"></span><br>
+                    <span id="p_s2_date"></span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -195,32 +227,37 @@
         }
 
         function update() {
-            // อัปเดตข้อความทั่วไป
-            document.getElementById('p_dept').innerText = document.getElementById('dept').value;
+            // ส่วนหัวและเดือน
             document.getElementById('p_no').innerText = document.getElementById('doc_no').value;
-            document.getElementById('p_date').innerText = document.getElementById('doc_date').value;
-            document.getElementById('p_signer').innerText = document.getElementById('signer').value;
-            document.getElementById('p_pos').innerText = document.getElementById('position').value;
+            document.getElementById('p_date_top').innerText = document.getElementById('doc_date_top').value;
+            document.getElementById('p_month').innerText = document.getElementById('target_month').value;
 
-            // คำนวณเงินอินเตอร์เน็ต 
+            // คำนวณเงิน
             const qty = parseInt(document.getElementById('inet_qty').value) || 0;
             const special = parseInt(document.getElementById('inet_special').value) || 0;
-            const inetTotal = (qty * 535) + (special * 749); [cite: 9, 11]
+            const inetTotal = (qty * 535) + (special * 749);
 
-            // คำนวณค่าใช้จ่ายอื่นๆ [cite: 18-21]
             const otherArr = document.getElementById('others').value.split(',');
             let otherTotal = 0;
             otherArr.forEach(v => otherTotal += parseFloat(v.trim()) || 0);
 
-            const grandTotal = inetTotal + otherTotal; [cite: 23]
+            const grandTotal = inetTotal + otherTotal;
 
-            // แสดงผลเป็นเลขไทย
             document.getElementById('p_inet_total').innerText = toThaiDigits(inetTotal.toLocaleString());
             document.getElementById('p_other_total').innerText = toThaiDigits(otherTotal.toLocaleString());
             document.getElementById('p_grand_total').innerText = toThaiDigits(grandTotal.toLocaleString());
+
+            // ส่วนลงชื่อ 1
+            document.getElementById('p_s1_rank').innerText = document.getElementById('s1_rank').value;
+            document.getElementById('p_s1_name').innerText = document.getElementById('s1_name').value;
+            document.getElementById('p_s1_pos').innerText = document.getElementById('s1_pos').value;
+
+            // ส่วนลงชื่อ 2
+            document.getElementById('p_s2_rank').innerText = document.getElementById('s2_rank').value;
+            document.getElementById('p_s2_pos').innerText = document.getElementById('s2_pos').value;
+            document.getElementById('p_s2_date').innerText = document.getElementById('s2_date').value;
         }
 
-        // เริ่มต้นทำงาน
         update();
     </script>
 </body>

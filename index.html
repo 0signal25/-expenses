@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>ระบบออกบันทึกข้อความเบิกค่าใช้จ่าย (ฉบับสมบูรณ์)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+        .container { max-width: 1100px; margin: 0 auto; display: flex; gap: 20px; }
+        .editor { flex: 0 0 450px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); height: fit-content; }
+        .preview { flex: 1; background: white; padding: 40px; border-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); position: sticky; top: 20px; }
+        
+        h3 { border-left: 4px solid #007bff; padding-left: 10px; color: #007bff; margin-top: 25px; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-weight: bold; font-size: 0.9em; margin-bottom: 4px; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-family: 'Sarabun', sans-serif; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .btn-print { width: 100%; background: #28a745; color: white; padding: 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold; margin-top: 25px; }
+        .btn-print:hover { background: #218838; }
+
+        @media print {
+            .editor, .btn-print { display: none; }
+            body { background: white; padding: 0; }
+            .container { display: block; }
+            .preview { box-shadow: none; width: 100%; padding: 0; position: static; }
+            .thai-sarabun { font-size: 16pt; line-height: 1.5; color: black; }
+        }
+        
+        .thai-sarabun { font-size: 15pt; line-height: 1.6; }
+        .text-center { text-align: center; }
+        .indent { margin-left: 40px; }
+        .signature-block { margin-top: 60px; margin-left: 50%; text-align: center; line-height: 1.2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="editor">
+        <h3>๑. ข้อมูลเอกสาร</h3>
+        <div class="form-group">
+            <label>เลขที่หนังสือ:</label>
+            <input type="text" id="doc_no" value="กห ๐๓๐๙.๓.๕(ตสส.)/" oninput="calculate()">
+        </div>
+        <div class="form-group">
+            <label>วันที่:</label>
+            <input type="text" id="doc_date" value="ก.พ.๖๙" oninput="calculate()">
+        </div>
+
+        <h3>๒. รายละเอียดค่าใช้จ่าย (คำนวณอัตโนมัติ)</h3>
+        <label>ค่าอินเตอร์เน็ต (จุดพิเศษ ๗๔๙ + จุดทั่วไป):</label>
+        <div class="grid-2 form-group">
+            <input type="number" id="inet_other_qty" value="7" oninput="calculate()" title="จำนวนจุดทั่วไป">
+            <input type="number" id="inet_other_price" value="535" oninput="calculate()" title="ราคาต่อจุด">
+        </div>
+        
+        <label>ค่าใช้จ่ายอื่นๆ (ถ่านไมค์/กล่องทีวี/ซิมกล้อง):</label>
+        <div class="grid-2 form-group">
+            <input type="number" class="other-price" value="200" oninput="calculate()">
+            <input type="number" class="other-price" value="278" oninput="calculate()">
+            <input type="number" class="other-price" value="500" oninput="calculate()">
+        </div>
+
+        <h3>๓. ผู้ลงนาม</h3>
+        <div class="form-group">
+            <label>ยศ-ชื่อ-นามสกุล:</label>
+            <input type="text" id="signer_name" value="พ.อ. ..........................................." oninput="calculate()">
+        </div>
+        <div class="form-group">
+            <label>ตำแหน่งผู้ลงนาม:</label>
+            <input type="text" id="signer_pos" value="ผบ.นพค.๒๕ สนภ.๒ นทพ." oninput="calculate()">
+        </div>
+
+        <button class="btn-print" onclick="window.print()">สั่งพิมพ์เอกสาร</button>
+    </div>
+
+    <div class="preview thai-sarabun">
+        <div class="text-center" style="font-size: 20pt;"><strong>บันทึกข้อความ</strong></div>
+        <p><strong>ส่วนราชการ</strong> ตสส.นสน.นพค.๒๕ สนภ.๒ นทพ. [cite: 4]</p>
+        <div style="display: flex; justify-content: space-between;">
+            <span><strong>ที่</strong> <span id="p_doc_no"></span></span>
+            <span><strong>วันที่</strong> <span id="p_doc_date"></span></span>
+        </div>
+        <p><strong>เรื่อง</strong> ขอเบิกค่าใช้จ่ายต่างๆประจำเดือนของ ตสส.นพค.๒๕ฯ [cite: 6]</p>
+        <p><strong>เรียน</strong> ผบ.นพค.๒๕ สนภ.๒ นทพ. [cite: 7]</p>
+        
+        <p>๑. ตสส.นสน.นพค.๒๕ฯ ขอเบิกค่าใช้จ่าย ประจำเดือน ม.ค.๖๙ มีรายละเอียด ดังนี้ [cite: 8]</p>
+        <div class="indent">
+            ๑.๑ ค่าอินเตอร์เน็ต รวมทั้งสิ้น <span id="p_inet_total"></span> บาท [cite: 9]<br>
+            ๑.๒ ค่าใช้จ่ายอื่นๆ รวมทั้งสิ้น <span id="p_other_total"></span> บาท [cite: 18]
+        </div>
+
+        <p>๒. ตสส.นสน.นพค.๒๕ ขออนุมัติเบิกค่าใช้จ่ายประจำเดือน มีรายละเอียด ดังนี้ [cite: 22]</p>
+        <div class="indent">
+            ๒.๑ ค่าจ่ายรายเดือนจำนวน <strong><span id="p_grand_total"></span></strong> บาท [cite: 23]
+        </div>
+
+        <p>๓. ข้อเสนอ เห็นควรดำเนินการตามข้อ ๓.๑ และ ๓.๒ [cite: 24]</p>
+        <br>
+        <p>จึงเรียนมาเพื่อพิจารณา หากเห็นสมควรกรุณาอนุมัติตามข้อ ๓ [cite: 27]</p>
+
+        <div class="signature-block">
+            (ลงชื่อ)...........................................................<br>
+            (<span id="p_signer_name"></span>)<br>
+            ตำแหน่ง <span id="p_signer_pos"></span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toThaiNumber(num) {
+        const thaiDigits = ['๐','๑','๒','๓','๔','๕','๖','๗','๘','๙'];
+        return num.toString().replace(/\d/g, (digit) => thaiDigits[digit]);
+    }
+
+    function calculate() {
+        // อัปเดตข้อมูลข้อความ
+        document.getElementById('p_doc_no').innerText = document.getElementById('doc_no').value;
+        document.getElementById('p_doc_date').innerText = document.getElementById('doc_date').value;
+        document.getElementById('p_signer_name').innerText = document.getElementById('signer_name').value;
+        document.getElementById('p_signer_pos').innerText = document.getElementById('signer_pos').value;
+
+        // คำนวณค่าอินเตอร์เน็ต (749 บาท คือจุดที่ 1.1.2 ที่ระบุในเอกสาร [cite: 11])
+        let inetTotal = 749; 
+        const qty = parseFloat(document.getElementById('inet_other_qty').value) || 0;
+        const price = parseFloat(document.getElementById('inet_other_price').value) || 0;
+        inetTotal += (qty * price);
+
+        // คำนวณค่าใช้จ่ายอื่นๆ [cite: 19, 20, 21]
+        let otherTotal = 0;
+        document.querySelectorAll('.other-price').forEach(input => {
+            otherTotal += parseFloat(input.value) || 0;
+        });
+
+        const grandTotal = inetTotal + otherTotal;
+
+        // แสดงผลตัวเลขไทย
+        document.getElementById('p_inet_total').innerText = toThaiNumber(inetTotal.toLocaleString());
+        document.getElementById('p_other_total').innerText = toThaiNumber(otherTotal.toLocaleString());
+        document.getElementById('p_grand_total').innerText = toThaiNumber(grandTotal.toLocaleString());
+    }
+
+    // เรียกทำงานทันทีที่โหลดหน้า
+    calculate();
+</script>
+
+</body>
+</html>

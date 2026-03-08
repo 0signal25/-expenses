@@ -2,100 +2,108 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ระบบเบิกเงินออนไลน์ - ตสส.นสน.นพค.๒๕</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเบิกจ่ายค่าใช้จ่ายประจำเดือน</title>
     <style>
         @font-face {
-            font-family: 'THSarabun';
+            font-family: 'THSarabunPSK';
             src: url('https://0signal25.github.io/-expenses/THSarabun.ttf') format('truetype');
             font-weight: normal;
             font-style: normal;
         }
 
         body {
-            background-color: #525659;
-            font-family: 'THSarabun', sans-serif;
-            font-size: 16pt;
+            background-color: #f0f0f0;
+            font-family: 'THSarabunPSK', sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
         }
 
+        /* ตั้งค่าหน้ากระดาษ A4 */
         .page {
             width: 210mm;
-            min-height: 297mm;
-            padding: 20mm 20mm 20mm 30mm; /* บน 2 ซม., ล่าง 2 ซม., ขวา 2 ซม., ซ้าย 3 ซม. */
-            margin: 20px 0;
+            height: 297mm;
+            padding: 20mm 20mm 20mm 30mm; /* บน ขวา ล่าง ซ้าย (ตามระเบียบสารบรรณ) */
+            margin: 10mm auto;
             background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            box-sizing: border-box;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
-            color: black;
-            line-height: 1.0; /* ระยะห่างบรรทัดเดียวตามมาตรฐานราชการ */
+            box-sizing: border-box;
+            line-height: 1.15;
+            font-size: 16pt;
         }
 
-        .header-container {
-            position: relative;
-            height: 3cm;
-            margin-bottom: 0.2cm;
+        /* ส่วนหัวบันทึกข้อความ */
+        .header {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 5mm;
         }
 
         .garuda {
-            width: 1.5cm; /* ขนาดตราครุฑตามชื่อไฟล์ 1.5 */
-            height: auto;
+            width: 1.5cm;
+            height: 1.5cm;
             position: absolute;
-            left: 0;
-            top: 0;
+            left: 20mm; /* ปรับตามความเหมาะสม */
+            top: 20mm;
         }
 
-        .doc-type {
+        .header-title {
             font-size: 29pt;
             font-weight: bold;
-            position: absolute;
-            left: 3.5cm;
-            top: 0.8cm;
-        }
-
-        .info-section {
             width: 100%;
-            margin-bottom: 0.3cm;
+            text-align: center;
+            margin-bottom: 2mm;
         }
 
-        .row {
+        .info-line {
             display: flex;
-            align-items: flex-end;
-            margin-bottom: 4px;
+            margin-bottom: 1mm;
         }
 
-        .label {
+        .info-label {
             font-weight: bold;
-            white-space: nowrap;
+            margin-right: 5px;
         }
 
-        .field {
+        .editable {
+            border-bottom: 1px dotted #ccc;
             flex-grow: 1;
-            padding-left: 5px;
+            min-width: 20px;
             outline: none;
-            min-height: 1em;
         }
 
-        /* ปรับระเบียบเนื้อหาและการย่อหน้า */
+        /* เนื้อหา */
+        .subject-line {
+            margin-top: 5mm;
+            margin-bottom: 5mm;
+        }
+
         .content-area {
             text-align: justify;
-            line-height: 1.1; /* เพิ่มเล็กน้อยเพื่อความอ่านง่ายแต่ยังคงความแน่นของต้นฉบับ */
+            text-justify: inter-character;
         }
 
-        .indent-standard { display: inline-block; width: 2.5cm; }
-        .indent-item { display: inline-block; width: 1cm; }
+        .indent {
+            display: inline-block;
+            width: 2.5cm;
+        }
 
-        .signature-group {
-            margin-top: 1.5cm;
+        p { margin: 0; }
+
+        /* ส่วนลงชื่อ */
+        .signature-block {
+            margin-top: 15mm;
             float: right;
-            width: 8cm;
+            width: 50%;
             text-align: center;
-            line-height: 1.0;
         }
 
+        .sign-space {
+            height: 20mm;
+        }
+
+        /* ปุ่มควบคุม */
         .controls {
             position: fixed;
             top: 20px;
@@ -103,8 +111,8 @@
             z-index: 1000;
         }
 
-        .btn-print {
-            padding: 12px 25px;
+        button {
+            padding: 10px 20px;
             background: #007bff;
             color: white;
             border: none;
@@ -112,89 +120,103 @@
             cursor: pointer;
             font-family: sans-serif;
             font-size: 14px;
-            font-weight: bold;
         }
 
+        button:hover {
+            background: #0056b3;
+        }
+
+        /* สำหรับการพิมพ์ */
         @media print {
-            body { background: none; }
-            .page { margin: 0; box-shadow: none; }
+            body { background: white; }
+            .page { 
+                margin: 0; 
+                box-shadow: none; 
+            }
             .controls { display: none; }
-            .field:hover { background: none; }
+            .editable { border-bottom: none; }
         }
     </style>
 </head>
 <body>
 
-<div class="controls">
-    <button class="btn-print" onclick="window.print()">พิมพ์บันทึกข้อความ</button>
-</div>
+    <div class="controls">
+        <button onclick="window.print()">พิมพ์เอกสาร</button>
+    </div>
 
-<div class="page">
-    <div class="header-container">
+    <div class="page" id="memo">
         <img src="https://0signal25.github.io/-expenses/ครุฑ1-5.png" class="garuda">
-        <div class="doc-type">บันทึกข้อความ</div>
-    </div>
+        <div class="header-title">บันทึกข้อความ</div>
 
-    <div class="info-section">
-        <div class="row">
-            <span class="label">ส่วนราชการ</span>
-            <div class="field" contenteditable="true">ตสส.นสน.นพค.๒๕ สนภ.๒ นทพ.</div>
+        <div class="info-line">
+            <span class="info-label">ส่วนราชการ</span>
+            <span class="editable" contenteditable="true">ตสส.นสน.นพค.๒๕ สนภ.๒ นทพ.</span>
         </div>
-        <div class="row">
-            <div style="display: flex; width: 55%;">
-                <span class="label">ที่</span>
-                <div class="field" contenteditable="true">กห ๐๓๐๙.๓.๕(ตสส.)/</div>
+
+        <div style="display: flex;">
+            <div class="info-line" style="flex: 1;">
+                <span class="info-label">ที่</span>
+                <span class="editable" contenteditable="true">กห ๐๓๐๙.๓.๕(ตสส.)/</span>
             </div>
-            <div style="display: flex; width: 45%;">
-                <span class="label">วันที่</span>
-                <div class="field" contenteditable="true">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;มี.ค.๖๙</div>
+            <div class="info-line" style="flex: 1;">
+                <span class="info-label">วันที่</span>
+                <span class="editable" contenteditable="true">มี.ค.๖๙</span>
             </div>
         </div>
-        <div class="row">
-            <span class="label">เรื่อง</span>
-            <div class="field" contenteditable="true">ขอเบิกค่าใช้จ่าย ต่างๆประจำเดือนของ ตสส.นพค.๒๕ฯ</div>
+
+        <div class="info-line subject-line">
+            <span class="info-label">เรื่อง</span>
+            <span class="editable" contenteditable="true">ขอเบิกค่าใช้จ่ายต่างๆประจำเดือนของ ตสส.นพค.๒๕ฯ</span>
         </div>
-    </div>
 
-    <div class="content-area">
-        <div class="field" contenteditable="true" style="margin-bottom: 8px;">เรียน ผบ.นพค.๒๕ สนภ.๒ นทพ.</div>
-
-        <div class="field" contenteditable="true">
-            <span class="indent-standard"></span>๑. ตสส.นสน.นพค.๒๕ฯ ขอเบิกค่าใช้จ่าย ประจำเดือน ก.พ.๖๙ มีรายละเอียด ดังนี้<br>
-            <span class="indent-standard"></span>๑.๑ ค่าอินเตอร์เน็ต ๗ จุด จุดละ ๕๓๕ บาท รวมทั้งสิ้น ๔,๔๙๔ บาท<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๑ Internet 3BB รหัส 430327982 (ห้องประชุม/ร้านกาแฟ)<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๒ Internet 3BB รหัส 430344071 (ตสส./ฝกง.) หมดโปรฯ เป็น ๗๔๙ บาท<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๓ Internet 3BB รหัส 430344117 (บ้านพัก ผบ./สโมสร น.สัญญาบัตร)<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๔ Internet 3BB รหัส 430344208 (บก.หน่วย/ฝกพ.)<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๕ Internet 3BB รหัส 430344234 (คลัง สป.๓)<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๖ Internet 3BB รหัส 440009550 (ป้อมยาม)<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๗ Internet 3BB รหัส 440291762 (บก.ช.พัฒนา)<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๑.๘ Internet 3BB รหัส 450302231 (โรงประกอบเลี้ยง น.ประทวนใหม่)<br>
-            <span class="indent-standard"></span>๑.๒ ค่าใช่จ่ายอื่นๆ รวมทั้งสิ้น ๙๗๘ บาท<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๒.๑ ค่าถ่านไมค์ลอย ๒๐๐ บาท<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๒.๒ ค่ากล่องทีวี (บ้านพัก ผบ./ห้องทำงาน ผบ.) ๒๗๘๔ บาท<br>
-            <span class="indent-standard"></span><span class="indent-item"></span>๑.๒.๓ ค่าซิมอินเตอร์เน็ต กล้องวงจรปิด ๕๐๐ บาท<br>
-            <br>
-            <span class="indent-standard"></span>๒. ตสส.นสน.นพค.๒๕ ขออนุมัติเบิกค่าใช้จ่ายประจำเดือน มีรายละเอียด ดังนี้<br>
-            <span class="indent-standard"></span>๒.๑ ค่าจ่ายรายเดือนจำนวน ๕,๔๗๒ บาท<br>
-            <br>
-            <span class="indent-standard"></span>๓. ข้อเสนอ เห็นควรดำเนินการดังนี้<br>
-            <span class="indent-standard"></span>๓.๑ กรุณาอนุมัติตามข้อ ๒<br>
-            <span class="indent-standard"></span>๓.๒ สำเนาให้ ฝกง.นพค.๒๕ฯ ทราบเพื่อดำเนินการในส่วนที่เกี่ยวข้อง
-            <br><br>
-            <span class="indent-standard"></span>จึงเรียนมาเพื่อพิจารณา หากเห็นสมควรกรุณาอนุมัติตามข้อ ๓
+        <div class="info-line">
+            <span class="info-label">เรียน</span>
+            <span class="editable" contenteditable="true">ผบ.นพค.๒๕ สนภ.๒ นทพ.</span>
         </div>
-    </div>
 
-    <div class="signature-group">
-        <div class="field" contenteditable="true">
-            <br><br>
-            (สุริยันต์ เปรมใจ)<br>
+        <div class="content-area">
+            <p><span class="indent"></span>๑. ตสส.นสน.นพค.๒๕ฯ ขอเบิกค่าใช้จ่าย ประจำเดือน ก.พ.๖๙ มีรายละเอียด ดังนี้</p>
+            <p style="margin-left: 1.5cm;">
+                ๑.๑ ค่าอินเตอร์เน็ต ๗ จุด จุดละ ๕๓๕ บาท รวมทั้งสิ้น ๔,๔๙๔ บาท [cite: 12]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๑ Internet 3BB รหัส 430327982 (ห้องประชุม/ร้านกาแฟ) [cite: 13]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๒ Internet 3BB รหัส 430344071 (ตสส./ฝกง.) หมดโปรฯ เป็น ๗๔๙ บาท [cite: 14]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๓ Internet 3BB รหัส 430344117 (บ้านพัก ผบ./สโมสร น.สัญญาบัตร) [cite: 15]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๔ Internet 3BB รหัส 430344208 (บก.หน่วย/ฝกพ.) [cite: 15]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๕ Internet 3BB รหัส 430344234 (คลัง สป.๓) [cite: 16]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๖ Internet 3BB รหัส 440009550 (ป้อมยาม) [cite: 17]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๗ Internet 3BB รหัส 440291762 (บก.ช.พัฒนา) [cite: 18]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๑.๘ Internet 3BB รหัส 450302231 (โรงประกอบเลี้ยง น.ประทวนใหม่) [cite: 19]
+            </p>
+            <p style="margin-left: 1.5cm;">
+                ๑.๒ ค่าใช่จ่ายอื่นๆ รวมทั้งสิ้น ๙๗๘ บาท [cite: 20]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๒.๑ ค่าถ่านไมค์ลอย ๒๐๐ บาท [cite: 21]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๒.๒ ค่ากล่องทีวี (บ้านพัก ผบ./ห้องทำงาน ผบ.) ๒๗๘ บาท [cite: 22]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;๑.๒.๓ ค่าซิมอินเตอร์เน็ต กล้องวงจรปิด ๕๐๐ บาท [cite: 23]
+            </p>
+            
+            <p><span class="indent"></span>๒. ตสส.นสน.นพค.๒๕ ขออนุมัติเบิกค่าใช้จ่ายประจำเดือน มีรายละเอียด ดังนี้ [cite: 24]</p>
+            <p style="margin-left: 1.5cm;">๒.๑ ค่าจ่ายรายเดือนจำนวน ๕,๔๗๒ บาท [cite: 25]</p>
+
+            <p><span class="indent"></span>๓. ข้อเสนอ เห็นควรดำเนินการดังนี้ [cite: 26]</p>
+            <p style="margin-left: 1.5cm;">
+                ๓.๑ กรุณาอนุมัติตามข้อ ๒ [cite: 27]<br>
+                ๓.๒ สำเนาให้ ฝกง.นพค.๒๕ฯ ทราบเพื่อดำเนินการในส่วนที่เกี่ยวข้อง [cite: 28]
+            </p>
+
+            <p><span class="indent"></span>จึงเรียนมาเพื่อพิจารณา หากเห็นสมควรกรุณาอนุมัติตามข้อ ๓ [cite: 29]</p>
+        </div>
+
+        <div class="signature-block">
+            <div class="sign-space"></div>
+            ( <span class="editable" contenteditable="true">สุริยันต์ เปรมใจ</span> ) [cite: 35]<br>
             พ.อ.<br>
-            ผบ.นสน.นพค.๒๕ สนภ.๒ นทพ.
+            ผบ.นสน.นพค.๒๕ สนภ.๒ นทพ. [cite: 36]
         </div>
     </div>
-</div>
 
+    <script>
+        // ฟังก์ชันสำหรับจัดการการคำนวณอัตโนมัติ (หากต้องการเพิ่มเติมในอนาคต)
+        // ขณะนี้สามารถพิมพ์แก้ไขเนื้อหาในช่อง contenteditable ได้โดยตรง
+    </script>
 </body>
 </html>

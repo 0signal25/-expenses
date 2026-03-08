@@ -2,38 +2,66 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <title>ระบบบันทึกข้อความเบิกค่าใช้จ่าย (ฉบับสมบูรณ์)</title>
+    <title>ระบบบันทึกข้อความ ตสส.นพค.๒๕</title>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Sarabun', 'TH SarabunPSK', sans-serif; background: #f4f7f6; margin: 0; padding: 20px; display: flex; gap: 20px; }
-        .editor-panel { width: 480px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); height: calc(100vh - 40px); overflow-y: auto; position: sticky; top: 20px; }
-        .editor-panel h3 { color: #1a73e8; font-size: 1.1rem; border-left: 4px solid #1a73e8; padding-left: 10px; margin-top: 25px; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-weight: bold; font-size: 0.85rem; margin-bottom: 4px; color: #444; }
-        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Sarabun', sans-serif; font-size: 14px; box-sizing: border-box; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn-print { width: 100%; background: #1a73e8; color: white; padding: 15px; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-print:hover { background: #1557b0; }
+        /* CSS สำหรับการจัดวางหน้าเว็บ */
+        body { font-family: 'Sarabun', sans-serif; background: #e9ecef; margin: 0; padding: 20px; display: flex; gap: 20px; }
+        .editor-panel { width: 450px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); height: calc(100vh - 40px); overflow-y: auto; position: sticky; top: 20px; }
+        .editor-panel h3 { color: #007bff; border-left: 4px solid #007bff; padding-left: 10px; font-size: 1.1rem; }
+        input, textarea { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; }
+        .btn-print { width: 100%; background: #28a745; color: white; padding: 15px; border: none; border-radius: 5px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
 
-        /* Document Preview */
-        .document-preview { background: white; width: 210mm; min-height: 297mm; padding: 20mm 20mm 20mm 25mm; box-shadow: 0 0 20px rgba(0,0,0,0.2); box-sizing: border-box; position: relative; color: black; }
-        .thai-document { font-family: 'TH SarabunPSK', 'Sarabun', sans-serif; font-size: 16pt; line-height: 1.12; }
-        .garuda-img { width: 1.5cm; position: absolute; top: 20mm; left: 20mm; }
-        .header-title { font-size: 29pt; font-weight: bold; margin-left: 2.5cm; margin-bottom: 0.5cm; margin-top: 5px;}
-        .info-row { display: flex; margin-bottom: 1mm; }
-        .info-label { font-weight: bold; margin-right: 5px; white-space: nowrap; }
-        .flex-1 { flex: 1; border-bottom: 1px dotted #eee; }
-        .indent { text-indent: 2.5cm; margin-top: 0.3cm; }
-        .list-item { padding-left: 3.5cm; text-indent: -1cm; }
+        /* CSS สำหรับเอกสาร (A4) */
+        .document-preview {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            /* ตั้งค่ากั้นหน้า 3 ซม. กั้นหลัง 2 ซม. */
+            padding: 20mm 20mm 20mm 30mm; 
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            position: relative;
+            color: black;
+        }
+
+        .thai-sarabun {
+            font-family: 'TH Sarabun New', 'TH SarabunPSK', 'Sarabun', sans-serif;
+            font-size: 16pt;
+            line-height: 1.15;
+        }
+
+        .garuda {
+            width: 1.5cm;
+            height: auto;
+            position: absolute;
+            top: 20mm;
+            left: 30mm;
+        }
+
+        .header-title {
+            font-size: 29pt;
+            font-weight: bold;
+            margin-left: 2cm;
+            padding-top: 5mm;
+            margin-bottom: 5mm;
+        }
+
+        .info-row { display: flex; margin-bottom: 1mm; align-items: flex-end; }
+        .info-label { font-weight: bold; min-width: 2.2cm; }
+        .flex-fill { flex: 1; border-bottom: 1px dotted #ccc; line-height: 1; }
         
-        .signature-group { margin-top: 20px; display: flex; flex-direction: column; align-items: flex-end; }
-        .sig-block { width: 8.5cm; text-align: center; margin-bottom: 15px; line-height: 1.2; }
-        .copy-note { position: absolute; top: 15mm; left: 20mm; font-size: 14pt; }
+        .indent { text-indent: 2.5cm; margin-top: 10px; }
+        .list-indent { padding-left: 3.5cm; text-indent: -1cm; margin-bottom: 2px; }
+        .sub-list { padding-left: 4.5cm; text-indent: -1.5cm; font-size: 15pt; line-height: 1.1; }
+
+        .signature-section { margin-top: 30px; display: flex; flex-direction: column; align-items: flex-end; }
+        .sig-block { width: 9cm; text-align: center; margin-bottom: 20px; line-height: 1.2; }
 
         @media print {
             .editor-panel { display: none; }
-            body { padding: 0; background: white; }
-            .document-preview { box-shadow: none; width: 100%; margin: 0; }
+            body { background: white; padding: 0; }
+            .document-preview { box-shadow: none; margin: 0; width: 100%; }
             @page { size: A4; margin: 0; }
         }
     </style>
@@ -41,129 +69,124 @@
 <body>
 
     <div class="editor-panel">
-        <h2>ระบบจัดการบันทึกข้อความ</h2>
+        <h2>แก้ไขข้อมูลออนไลน์</h2>
         <div class="form-group">
-            <label>ประจำเดือน (ในเนื้อหา):</label>
+            <label>เลขที่หนังสือ:</label>
+            <input type="text" id="doc_no" value="กห ๐๓๐๙.๓.๕(ตสส.)/" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>วันที่ (หัวกระดาษ):</label>
+            <input type="text" id="doc_date" value="ก.พ.๖๙" oninput="update()">
+        </div>
+        <div class="form-group">
+            <label>ประจำเดือน (เนื้อหา):</label>
             <input type="text" id="target_month" value="ม.ค.๖๙" oninput="update()">
         </div>
-        <div class="form-group">
-            <label>วันที่ (หัวเอกสาร):</label>
-            <input type="text" id="doc_date_top" value="ก.พ.๖๙" oninput="update()">
-        </div>
 
-        <h3>๑. รายการอินเตอร์เน็ต (๑.๑.๑ - ๑.๑.๘)</h3>
-        <textarea id="inet_list_text" rows="6" oninput="update()">
-๑.๑.๑ Internet 3BB รหัส 430327982 (ห้องประชุม/ร้านกาแฟ)
-๑.๑.๒ Internet 3BB รหัส 430344071 (ตสส./ฝกง.) หมดโปรฯ เป็น ๗๔๙ บาท
-๑.๑.๓ Internet 3BB รหัส 430344117 (บ้านพัก ผบ./สโมสร น.สัญญาบัตร)
-๑.๑.๔ Internet 3BB รหัส 430344208 (บก.หน่วย/ฝกพ.)
-๑.๑.๕ Internet 3BB รหัส 430344234 (คลัง สป.๓)
-๑.๑.๖ Internet 3BB รหัส 440009550 (ป้อมยาม)
-๑.๑.๗ Internet 3BB รหัส 440291762 (บก.ช.พัฒนา)
-๑.๑.๘ Internet 3BB รหัส 450302231 (โรงประกอบเลี้ยง น.ประทวนใหม่)</textarea>
+        <h3>ผู้ขอเบิก (พ.ท.)</h3>
+        <input type="text" id="s1_rank" value="พ.ท." oninput="update()">
+        <input type="text" id="s1_name" value="(สุริยันต์ เปรมใจ)" oninput="update()">
+        <input type="text" id="s1_pos" value="ผบ.นสน.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
 
-        <h3>๒. ค่าใช้จ่ายอื่นๆ (๑.๒.๑ - ๑.๒.๓)</h3>
-        <textarea id="other_list_text" rows="3" oninput="update()">
-๑.๒.๑ ค่าถ่านไมค์ลอย ๒๐๐ บาท
-๑.๒.๒ ค่ากล่องทีวี (บ้านพัก ผบ./ห้องทำงาน ผบ.) ๒๗๘ บาท
-๑.๒.๓ ค่าซิมอินเตอร์เน็ต กล้องวงจรปิด ๕๐๐ บาท</textarea>
+        <h3>ผู้เห็นควร (รอง ผบ.)</h3>
+        <input type="text" id="s2_rank" value="พ.อ." oninput="update()">
+        <input type="text" id="s2_pos" value="รอง ผบ.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
 
-        <h3>๓. ผู้ลงนาม (ตามลำดับ)</h3>
-        <label>๑. ผู้ขอเบิก (พ.ท.):</label>
-        <input type="text" id="sig1_name" value="(สุริยันต์ เปรมใจ)" oninput="update()">
-        <input type="text" id="sig1_pos" value="ผบ.นสน.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
+        <h3>ผู้อนุมัติ (ผบ.)</h3>
+        <input type="text" id="s3_rank" value="พ.อ." oninput="update()">
+        <input type="text" id="s3_pos" value="ผบ.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
 
-        <label>๒. รอง ผบ. (ผู้เห็นควร):</label>
-        <input type="text" id="sig2_name" value="พ.อ." oninput="update()">
-        <input type="text" id="sig2_pos" value="รอง ผบ.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
-
-        <label>๓. ผู้อนุมัติ (ผบ.):</label>
-        <input type="text" id="sig3_name" value="พ.อ." oninput="update()">
-        <input type="text" id="sig3_pos" value="ผบ.นพค.๒๕ สนภ.๒ นทพ." oninput="update()">
-
-        <button class="btn-print" onclick="window.print()">พิมพ์บันทึกข้อความ</button>
+        <button class="btn-print" onclick="window.print()">สั่งพิมพ์เอกสาร</button>
     </div>
 
-    <div class="document-preview thai-document">
-        <div class="copy-note">(สำเนา)</div>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Garuda_Emb_of_Thailand_%28Variant%29.svg/1200px-Garuda_Emb_of_Thailand_%28Variant%29.svg.png" class="garuda-img">
+    <div class="document-preview thai-sarabun">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Garuda_Emb_of_Thailand_%28Variant%29.svg/512px-Garuda_Emb_of_Thailand_%28Variant%29.svg.png" class="garuda">
+        
         <div class="header-title">บันทึกข้อความ</div>
 
         <div class="info-row">
             <div class="info-label">ส่วนราชการ</div>
-            <div class="flex-1">ตสส.นสน.นพค.๒๕ สนภ.๒ นทพ.</div>
+            <div class="flex-fill">ตสส.นสน.นพค.๒๕ สนภ.๒ นทพ.</div>
         </div>
         <div class="info-row">
-            <div class="flex-1"><span class="info-label">ที่</span> กห ๐๓๐๙.๓.๕(ตสส.)/</div>
-            <div style="width: 45%"><span class="info-label">วันที่</span> <span id="p_date_top"></span></div>
+            <div class="flex-fill"><strong>ที่</strong> <span id="p_doc_no"></span></div>
+            <div style="width: 45%"><strong>วันที่</strong> <span id="p_doc_date"></span></div>
         </div>
         <div class="info-row">
             <div class="info-label">เรื่อง</div>
-            <div class="flex-1">ขอเบิกค่าใช้จ่ายต่างๆประจำเดือนของ ตสส.นพค.๒๕ฯ</div>
+            <div class="flex-fill">ขอเบิกค่าใช้จ่ายต่างๆประจำเดือนของ ตสส.นพค.๒๕ฯ</div>
         </div>
 
-        <p><span class="info-label">เรียน</span> ผบ.นพค.๒๕ สนภ.๒ นทพ.</p>
+        <p><strong>เรียน</strong> ผบ.นพค.๒๕ สนภ.๒ นทพ.</p>
 
-        <p class="indent">๑. ตสส.นสน.นพค.๒๕ฯ ขอเบิกค่าใช้จ่าย ประจำเดือน <span id="p_month"></span> มีรายละเอียด ดังนี้ [cite: 8]</p>
-        <div class="list-item">๑.๑ ค่าอินเตอร์เน็ต ๗ จุด รวมทั้งสิ้น ๔,๔๙๔ บาท [cite: 9]</div>
-        <div id="p_inet_list" style="white-space: pre-line; padding-left: 4.5cm;"></div>
+        <p class="indent">๑. ตสส.นสน.นพค.๒๕ฯ ขอเบิกค่าใช้จ่าย ประจำเดือน <span id="p_month"></span> มีรายละเอียด ดังนี้</p>
+        <div class="list-indent">๑.๑ ค่าอินเตอร์เน็ต ๗ จุด จุดละ ๕๓๕ บาท รวมทั้งสิ้น ๔,๔๙๔ บาท</div>
+        <div class="sub-list">๑.๑.๑ Internet 3BB รหัส 430327982 (ห้องประชุม/ร้านกาแฟ)</div>
+        <div class="sub-list">๑.๑.๒ Internet 3BB รหัส 430344071 (ตสส./ฝกง.) หมดโปรฯ เป็น ๗๔๙ บาท</div>
+        <div class="sub-list">๑.๑.๓ Internet 3BB รหัส 430344117 (บ้านพัก ผบ./สโมสร น.สัญญาบัตร)</div>
+        <div class="sub-list">๑.๑.๔ Internet 3BB รหัส 430344208 (บก.หน่วย/ฝกพ.)</div>
+        <div class="sub-list">๑.๑.๕ Internet 3BB รหัส 430344234 (คลัง สป.๓)</div>
+        <div class="sub-list">๑.๑.๖ Internet 3BB รหัส 440009550 (ป้อมยาม)</div>
+        <div class="sub-list">๑.๑.๗ Internet 3BB รหัส 440291762 (บก.ช.พัฒนา)</div>
+        <div class="sub-list">๑.๑.๘ Internet 3BB รหัส 450302231 (โรงประกอบเลี้ยง น.ประทวนใหม่)</div>
         
-        <div class="list-item">๑.๒ ค่าใช่จ่ายอื่นๆ รวมทั้งสิ้น ๙๗๘ บาท [cite: 18]</div>
-        <div id="p_other_list" style="white-space: pre-line; padding-left: 4.5cm;"></div>
+        <div class="list-indent">๑.๒ ค่าใช่จ่ายอื่นๆ รวมทั้งสิ้น ๙๗๘ บาท</div>
+        <div class="sub-list">๑.๒.๑ ค่าถ่านไมค์ลอย ๒๐๐ บาท</div>
+        <div class="sub-list">๑.๒.๒ ค่ากล่องทีวี (บ้านพัก ผบ./ห้องทำงาน ผบ.) ๒๗๘ บาท</div>
+        <div class="sub-list">๑.๒.๓ ค่าซิมอินเตอร์เน็ต กล้องวงจรปิด ๕๐๐ บาท</div>
 
-        <p class="indent">๒. ตสส.นสน.นพค.๒๕ ขออนุมัติเบิกค่าใช้จ่ายประจำเดือน มีรายละเอียด ดังนี้ [cite: 22]</p>
-        <div class="list-item">๒.๑ ค่าจ่ายรายเดือนจำนวน ๕,๔๗๒ บาท [cite: 23]</div>
+        <p class="indent">๒. ตสส.นสน.นพค.๒๕ ขออนุมัติเบิกค่าใช้จ่ายประจำเดือน มีรายละเอียด ดังนี้</p>
+        <div class="list-indent">๒.๑ ค่าจ่ายรายเดือนจำนวน ๕,๔๗๒ บาท</div>
 
-        <p class="indent">๓. ข้อเสนอ เห็นควรดำเนินการดังนี้ [cite: 24]</p>
-        <div class="list-item">๓.๑ กรุณาอนุมัติตามข้อ ๒ [cite: 25]</div>
-        <div class="list-item">๓.๒ สำเนาให้ ฝกง.นพค.๒๕ฯ ทราบเพื่อดำเนินการในส่วนที่เกี่ยวข้อง [cite: 26]</div>
+        <p class="indent">๓. ข้อเสนอ เห็นควรดำเนินการดังนี้</p>
+        <div class="list-indent">๓.๑ กรุณาอนุมัติตามข้อ ๒</div>
+        <div class="list-indent">๓.๒ สำเนาให้ ฝกง.นพค.๒๕ฯ ทราบเพื่อดำเนินการในส่วนที่เกี่ยวข้องและดำเนินการต่อไป</div>
 
-        <p class="indent">จึงเรียนมาเพื่อพิจารณา หากเห็นสมควรกรุณาอนุมัติตามข้อ ๓ [cite: 27]</p>
+        <p class="indent" style="margin-bottom: 0;">จึงเรียนมาเพื่อพิจารณา หากเห็นสมควรกรุณาอนุมัติตามข้อ ๓</p>
 
-        <div class="signature-group">
+        <div class="signature-section">
             <div class="sig-block">
                 <br>(ลงชื่อ)...........................................................<br>
-                พ.ท. <span id="p_sig1_name"></span><br>
-                ตำแหน่ง <span id="p_sig1_pos"></span>
+                <span id="p_s1_rank"></span> <span id="p_s1_name"></span><br>
+                ตำแหน่ง <span id="p_s1_pos"></span>
             </div>
         </div>
 
-        <p><strong>คำสั่ง/อนุมัติ</strong></p>
+        <p style="margin-top: 0;"><strong>คำสั่ง/อนุมัติ</strong></p>
         
-        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+        <div style="display: flex; justify-content: space-between;">
             <div class="sig-block" style="text-align: center;">
                 เห็นควรดำเนินการตามข้อ ๓<br><br>
                 (ลงชื่อ)...........................................................<br>
-                (<span id="p_sig2_name"></span>)<br>
-                ตำแหน่ง <span id="p_sig2_pos"></span><br>
-                ........./ก.พ./๖๙
+                (<span id="p_s2_rank"></span>)<br>
+                ตำแหน่ง <span id="p_s2_pos"></span><br>
+                ........../ก.พ./๖๙
             </div>
             <div class="sig-block" style="text-align: center;">
                 อนุมัติตามข้อ ๓<br><br>
                 (ลงชื่อ)...........................................................<br>
-                (<span id="p_sig3_name"></span>)<br>
-                ตำแหน่ง <span id="p_sig3_pos"></span><br>
-                ........./ก.พ./๖๙
+                (<span id="p_s3_rank"></span>)<br>
+                ตำแหน่ง <span id="p_s3_pos"></span><br>
+                ........../ก.พ./๖๙
             </div>
         </div>
     </div>
 
     <script>
         function update() {
-            document.getElementById('p_date_top').innerText = document.getElementById('doc_date_top').value;
+            document.getElementById('p_doc_no').innerText = document.getElementById('doc_no').value;
+            document.getElementById('p_doc_date').innerText = document.getElementById('doc_date').value;
             document.getElementById('p_month').innerText = document.getElementById('target_month').value;
-            
-            document.getElementById('p_inet_list').innerText = document.getElementById('inet_list_text').value;
-            document.getElementById('p_other_list').innerText = document.getElementById('other_list_text').value;
 
-            document.getElementById('p_sig1_name').innerText = document.getElementById('sig1_name').value;
-            document.getElementById('p_sig1_pos').innerText = document.getElementById('sig1_pos').value;
+            document.getElementById('p_s1_rank').innerText = document.getElementById('s1_rank').value;
+            document.getElementById('p_s1_name').innerText = document.getElementById('s1_name').value;
+            document.getElementById('p_s1_pos').innerText = document.getElementById('s1_pos').value;
 
-            document.getElementById('p_sig2_name').innerText = document.getElementById('sig2_name').value;
-            document.getElementById('p_sig2_pos').innerText = document.getElementById('sig2_pos').value;
+            document.getElementById('p_s2_rank').innerText = document.getElementById('s2_rank').value;
+            document.getElementById('p_s2_pos').innerText = document.getElementById('s2_pos').value;
 
-            document.getElementById('p_sig3_name').innerText = document.getElementById('sig3_name').value;
-            document.getElementById('p_sig3_pos').innerText = document.getElementById('sig3_pos').value;
+            document.getElementById('p_s3_rank').innerText = document.getElementById('s3_rank').value;
+            document.getElementById('p_s3_pos').innerText = document.getElementById('s3_pos').value;
         }
         update();
     </script>
